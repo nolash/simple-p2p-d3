@@ -1,116 +1,11 @@
 var BACKEND_URL='http://127.0.0.1:8888'; // our sim server
 var networkname = "meta"; // what to call the REST entry point
-var cursor = 0; // the index of the current (event invoking) request being posted
-
-/*
-var prereqs = [
-	{method: "POST", url: "/node", payload: null,},
-	{method: "POST", url: "/node", payload: null,},	
-	{method: "POST", url: "/node", payload: null,},	
-	{method: "POST", url: "/node", payload: null,},
-	{method: "POST", url: "/node", payload: null,},	
-	{method: "POST", url: "/node", payload: null,},	
-	{method: "POST", url: "/node", payload: null,},
-	{method: "POST", url: "/node", payload: null,},	
-	{method: "POST", url: "/node", payload: null,},	
-	{method: "POST", url: "/node", payload: null,},	
-	
-	{method: "PUT", url: "/node", payload: {One: 1},},
-	{method: "PUT", url: "/node", payload: {One: 2},},
-	{method: "PUT", url: "/node", payload: {One: 3},},
-	{method: "PUT", url: "/node", payload: {One: 4},},
-	{method: "PUT", url: "/node", payload: {One: 5},},
-	{method: "PUT", url: "/node", payload: {One: 6},},
-	{method: "PUT", url: "/node", payload: {One: 7},},
-	{method: "PUT", url: "/node", payload: {One: 8},},
-	{method: "PUT", url: "/node", payload: {One: 9},},
-	{method: "PUT", url: "/node", payload: {One: 10},},
-	
-	{method: "PUT", url: "/node", payload: {One: 1, Other: 2}},
-	{method: "PUT", url: "/node", payload: {One: 2, Other: 3}},
-	{method: "PUT", url: "/node", payload: {One: 3, Other: 4}},
-	{method: "PUT", url: "/node", payload: {One: 4, Other: 5}},
-	{method: "PUT", url: "/node", payload: {One: 5, Other: 6}},
-	{method: "PUT", url: "/node", payload: {One: 6, Other: 7}},
-	{method: "PUT", url: "/node", payload: {One: 7, Other: 8}},
-	{method: "PUT", url: "/node", payload: {One: 8, Other: 9}},
-	{method: "PUT", url: "/node", payload: {One: 9, Other: 10}},
-	{method: "PUT", url: "/node", payload: {One: 10, Other: 1}},
-	
-]
-
-var postreqs = [
-	{method: "PUT", url: "/node", payload: {One: 1, Other: 2, AssetType: 1}},
-	{method: "PUT", url: "/node", payload: {One: 5, Other: 6, AssetType: 1}},
-	{method: "PUT", url: "/node", payload: {One: 1, Other: 2, AssetType: 1}},
-	{method: "POST", url: "/node/msg", payload: {One: 1, Other: 2, Protocol: "METAAnnounce", Command: 0, "Uuid": 1234567890, "Payload":}},
-]
-*/
 
 
 function initializeServer(){
-		//console.log("we have a snapshot of " + prereqs.length + " requests and animation of " + postreqs.length + " requests linedup for you in this run");
 		initializeVisualisationWithClass(networkname);
-		/*
-          $.post(BACKEND_URL + "/", JSON.stringify({"Id":networkname})).then(
-            function(d){
-              console.log("Backend POST init ok");
-              //preSequence(networkname);
-              initializeVisualisationWithClass(networkname);
-			  
-            },
-            function(e) { 
-              console.log("Error sending POST to " + BACKEND_URL); 
-              console.log(e); 
-            })
-            */
+
 };
-
-function preSequence(networkname_) {
-	
-	if (cursor == prereqs.length)
-		return false;
-		
-	var effectiveurl = BACKEND_URL + "/" + networkname_ + prereqs[cursor].url + "/";
-	$.ajax({
-		type: prereqs[cursor].method,
-		url: effectiveurl,
-		dataType: "json",
-		mimeType: "application/json",
-		data: JSON.stringify(prereqs[cursor].payload),
-	}).done(function() {
-		cursor++;
-		
-		if (cursor == prereqs.length) {
-			initializeVisualisationWithClass(networkname);
-			
-		} else {
-			preSequence(networkname_);
-		}
-	});	
-	
-	return true;
-}
-
-function postSequence(networkname_) {
-	
-	if (cursor == postreqs.length)
-		return false;
-		
-	var effectiveurl = BACKEND_URL + "/" + networkname_ + postreqs[cursor].url + "/";
-	$.ajax({
-		type: postreqs[cursor].method,
-		url: effectiveurl,
-		dataType: "json",
-		mimeType: "application/json",
-		data: JSON.stringify(postreqs[cursor].payload),
-	}).done(function() {
-		cursor++;
-		updateVisualisationWithClass(networkname, 500, postSequence);
-	});	
-	
-	return true;
-}
 
 function initializeVisualisationWithClass(networkname_){
 
@@ -173,11 +68,6 @@ function initializeVisualisationWithClass(networkname_){
                     
                 self.visualisation.initializeVisualisation(self.graphNodes,self.graphLinks);
 
-                //self.visualisationInterval = setInterval(updateVisualisationWithClass,1000);
-                //setTimeOut(function() {updateVisualisationWithClass(networkname_, 1, testPostSequence)}, 0);
-                //updateVisualisationWithClass(networkname_, 1, testPostSequence)
-                cursor = 0;
-                //setTimeout(function() {postSequence(networkname_)}, 2000);
                 updateVisualisationWithClass(networkname, 500, function () {updateVisualisationWithClass(networkname_, 500, updateVisualisationWithClass)});
               },
               function(e){ console.log(e); }
@@ -241,10 +131,8 @@ function updateVisualisationWithClass(networkname_, delay, callback){
                     })
                     .toArray();
                     
-					//if(newNodes.length > 0 || newLinks.length > 0 || removeNodes.length > 0 || removeLinks.length > 0 || triggerMsgs.length > 0) {
-						self.visualisation.updateVisualisation(newNodes,newLinks,removeNodes,removeLinks,triggerMsgs);
-						setTimeout(function() {callback(networkname_, delay, callback)}, delay);
-					//}
+					self.visualisation.updateVisualisation(newNodes,newLinks,removeNodes,removeLinks,triggerMsgs);
+					setTimeout(function() {callback(networkname_, delay, callback)}, delay);
                     
                 },
                 function(e){ console.log(e); }
