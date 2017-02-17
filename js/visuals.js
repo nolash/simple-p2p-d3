@@ -1,3 +1,6 @@
+var tmp_msgcodecols = ["#ff0000", "#0ff000", "#00ff00", "#000ff0", "#0000ff", "#0fff00", "#00fff0"];
+
+
 class P2Pd3Sidebar {
   constructor(selector) {
     this.sidebar = $(selector)
@@ -216,7 +219,7 @@ class P2Pd3 {
     // add new links
     this.link = this.link.enter().append("line")
 				.attr("stroke", "#808080")
-				.attr("stroke-width", "1.0")
+				.attr("stroke-width", "2.0")
 				.merge(this.link);
     
     return this.link;
@@ -232,11 +235,15 @@ class P2Pd3 {
 	triggerMsgs(msgs){
 		this.graphMsgs = [];
 		for (var i = 0; i < msgs.length; i++) {
+			var themessagecolor = tmp_msgcodecols[msgs[i].subcode]
+			if (!themessagecolor) {
+				themessagecolor = "#ffffff";
+			}
 			var conn = this.getConnByNodes(msgs[i].source,msgs[i].target);
 			if (conn != -1) {
 				var line = $("g.links").find("line:nth-child(" + (conn + 1) + ")");
 				//console.log("triggermsg on conn index " + conn + " obj " + line);
-				$(line).attr("stroke", "#ff0000");
+				$(line).attr("stroke", themessagecolor);
 				this.graphMsgs.push(msgs[i]);
 			} else {
 				console.log("source " + msgs[i].source + " and target "+  msgs[i].target + " matched no existing conn");

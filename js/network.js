@@ -1,7 +1,8 @@
 var BACKEND_URL='http://127.0.0.1:8888'; // our sim server
-var networkname = "metaschmeta"; // what to call the REST entry point
+var networkname = "meta"; // what to call the REST entry point
 var cursor = 0; // the index of the current (event invoking) request being posted
 
+/*
 var prereqs = [
 	{method: "POST", url: "/node", payload: null,},
 	{method: "POST", url: "/node", payload: null,},	
@@ -41,21 +42,28 @@ var prereqs = [
 var postreqs = [
 	{method: "PUT", url: "/node", payload: {One: 1, Other: 2, AssetType: 1}},
 	{method: "PUT", url: "/node", payload: {One: 5, Other: 6, AssetType: 1}},
-	//{method: "PUT", url: "/node", payload: {One: 1, Other: 2, AssetType: 1}},
+	{method: "PUT", url: "/node", payload: {One: 1, Other: 2, AssetType: 1}},
+	{method: "POST", url: "/node/msg", payload: {One: 1, Other: 2, Protocol: "METAAnnounce", Command: 0, "Uuid": 1234567890, "Payload":}},
 ]
+*/
+
 
 function initializeServer(){
-		console.log("we have a snapshot of " + prereqs.length + " requests and animation of " + postreqs.length + " requests linedup for you in this run");
+		//console.log("we have a snapshot of " + prereqs.length + " requests and animation of " + postreqs.length + " requests linedup for you in this run");
+		initializeVisualisationWithClass(networkname);
+		/*
           $.post(BACKEND_URL + "/", JSON.stringify({"Id":networkname})).then(
             function(d){
               console.log("Backend POST init ok");
-              preSequence(networkname);
-				
+              //preSequence(networkname);
+              initializeVisualisationWithClass(networkname);
+			  
             },
             function(e) { 
               console.log("Error sending POST to " + BACKEND_URL); 
               console.log(e); 
             })
+            */
 };
 
 function preSequence(networkname_) {
@@ -169,7 +177,8 @@ function initializeVisualisationWithClass(networkname_){
                 //setTimeOut(function() {updateVisualisationWithClass(networkname_, 1, testPostSequence)}, 0);
                 //updateVisualisationWithClass(networkname_, 1, testPostSequence)
                 cursor = 0;
-                setTimeout(function() {postSequence(networkname_)}, 2000);
+                //setTimeout(function() {postSequence(networkname_)}, 2000);
+                updateVisualisationWithClass(networkname, 500, function () {updateVisualisationWithClass(networkname_, 500, updateVisualisationWithClass)});
               },
               function(e){ console.log(e); }
             )
@@ -219,19 +228,23 @@ function updateVisualisationWithClass(networkname_, delay, callback){
 					var triggerMsgs = $(graph.add)
                     .filter(function(i,e){return e.group === 'msgs'})
                     .map(function(i,e){ 
+						summarysplit = /^type: ([0-9]+),(.+)/.exec(e.data.extra.Summary);
                         return {
                             source: e.data.source, 
                             target: e.data.target, 
                             group: 1,
-                            value: i
+                            value: i,
+							code: e.data.extra.Code,
+							subcode: parseInt(summarysplit[1], 10),
+							summary: summarysplit[2],
                         };
                     })
                     .toArray();
                     
-					if(newNodes.length > 0 || newLinks.length > 0 || removeNodes.length > 0 || removeLinks.length > 0 || triggerMsgs.length > 0) {
+					//if(newNodes.length > 0 || newLinks.length > 0 || removeNodes.length > 0 || removeLinks.length > 0 || triggerMsgs.length > 0) {
 						self.visualisation.updateVisualisation(newNodes,newLinks,removeNodes,removeLinks,triggerMsgs);
-						setTimeout(function() {callback(networkname_)}, delay);
-					}
+						setTimeout(function() {callback(networkname_, delay, callback)}, delay);
+					//}
                     
                 },
                 function(e){ console.log(e); }
