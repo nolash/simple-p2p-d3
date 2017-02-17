@@ -119,17 +119,20 @@ function updateVisualisationWithClass(networkname_, delay, callback){
                     .filter(function(i,e){return e.group === 'msgs'})
                     .map(function(i,e){ 
 						summarysplit = /^type: ([0-9]+),(.+)/.exec(e.data.extra.Summary);
+						subcode = parseInt(summarysplit[1], 10);
+						logMessage(e.data.source, e.data.target, subcode, summarysplit[2]);
                         return {
                             source: e.data.source, 
                             target: e.data.target, 
                             group: 1,
                             value: i,
 							code: e.data.extra.Code,
-							subcode: parseInt(summarysplit[1], 10),
+							subcode: subcode,
 							summary: summarysplit[2],
                         };
                     })
                     .toArray();
+                    
                     
 					self.visualisation.updateVisualisation(newNodes,newLinks,removeNodes,removeLinks,triggerMsgs);
 					setTimeout(function() {callback(networkname_, delay, callback)}, delay);
@@ -139,3 +142,7 @@ function updateVisualisationWithClass(networkname_, delay, callback){
             )
 
 };
+
+function logMessage(source, target, subcode, summary) {
+	$(".node-selected").append("<div id='msg-target-source-" + new Date() + "'>Msg: " + source + " => " + target + ": (" + subcode + ") " + summary + "</div>");
+}
