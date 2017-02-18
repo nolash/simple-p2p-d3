@@ -7,16 +7,7 @@
 
     <script src="js/lib/jquery-2.2.4.min.js"></script>
     <script src="js/lib/d3.v4.min.js"></script>    
-    <script src="js/visuals.js"></script>
-    <script src="js/network.js"></script>
-    <script src="js/edcon.js"></script>
     
-    <script>
-    $(document).ready(function() {
-			console.log("loaded");
-			initializeServer();	
-	});
-    </script>
     
     <link rel="stylesheet" href="d3.css">
     
@@ -26,26 +17,22 @@
     <svg id="network-visualisation" width="960" height="600"></svg>
     <div id="sidebar" class=sidebar>
       <div id="selected-node">
-        <div class="node-selected">
-         <!-- <h3>Node Information</h1>
-          <ul>
-            <li> Node Id: <span class="node-id"></span> </li>
-            <li> Balance: <span class="node-balance"></span> </li>
-          </ul>            
-
-          <table class="node-kademlia-table">
-            <thead>
-              <td>Id</td>
-              <td>IP:Port</td>
-              <td>Distance</td>
-            </thead>
-            <tbody>
-              
-            </tbody>
-          </table>-->
+        <div class="node-selected" id="node-selected">
         </div>
       </div>
     </div>
+    <script src="js/visuals.js"></script>
+    <script src="js/network.js"></script>
+    <script src="js/edcon.js"></script>
+    
+    <script>
+		
+ 
+    $(document).ready(function() {
+			console.log("loaded");
+			initializeServer("node-selected");	
+	});
+    </script>
   </body>
 </html>
 
