@@ -1,8 +1,3 @@
-var g_color_inactive = [0xa0, 0xa0, 0xa0];
-var g_color_active = [0xff, 0x02, 0xd1];
-var g_color_step = 0.2;
-
-
 // startcolor and endcolor in 3 element array 8bit
 // step is float 0-1.0
 function colorStep(startcolor, endcolor, step) { 
