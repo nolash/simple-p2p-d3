@@ -30,37 +30,56 @@ function initializeServer(logdivid_){
 
 function initializeUpdater() {
 	
-	var item;
-	do {
-		item = midiNext();
-		if (item != undefined) {
-			var itemn = parseInt(item) - 1;
-			console.log("got midiitem " + item);
-			if (nodes[itemn] == "") {
+	var idx = midiNext();
+	console.log("idx: " + idx);
+	if (idx != undefined) {
+			var idxn = [parseInt(idx[0]) - 1, parseInt(idx[1]) - 1];
+			console.log("got midiitem " + idxn[0] + " + " + idxn[1]);
+			console.log("is nodes " + nodes[idxn[0]] + " + " + nodes[idxn[1]]);
+			if (nodes[idxn[0]] == "") {
+				console.log("sending creat");
 				$.ajax({
 					type: "POST",
 					url: BACKEND_URL + "/" + networkname +  "/node/",
 					dataType: "json",
 					success: function(e) {
-						nodes[itemn] = e.Id;
+						nodes[idxn[0]] = e.Id;
 					},
+				}).then(function() {
+					initializeUpdater();
 				});
-			} else {
+			} else if (nodes[idxn[1]] == "" || nodes[idxn[1]] == undefined) {
+				console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! setting up " + nodes[idxn[0]]);
 				$.ajax({
 					type: "PUT",
 					crossDomain: true,
 					url: BACKEND_URL + "/" + networkname +  "/node/",
-					data: JSON.stringify({One: item}),
+					data: JSON.stringify({One: nodes[idxn[0]]}),
 					dataType: "json",
-					success: function(e) {
-						nodes[itemn] = e.Id;
-					},
+				}).then(function() {
+					initializeUpdater();
 				});
+			} else if (idxn[1] > -1) {
+				console.log("sending conn " + nodes[idxn[0]] + " " + nodes[idxn[1]]);
+				$.ajax({
+					type: "PUT",
+					crossDomain: true,
+					url: BACKEND_URL + "/" + networkname +  "/node/",
+					data: JSON.stringify({One: nodes[idxn[0]], Other: nodes[idxn[1]]}),
+					dataType: "json",
+				}).then(function() {
+					initializeUpdater();
+				});
+			} else {
+				setTimeout(initializeUpdater, 100);		
 			}
-		}
-	} while (item != undefined);
-	setTimeout(initializeUpdater, 500);
+	} else {
+		setTimeout(initializeUpdater, 100);	
+	}
+	
 }
+
+
 
 function initializeVisualisationWithClass(networkname_){
 
@@ -86,8 +105,8 @@ function initializeVisualisationWithClass(networkname_){
                     .toArray();
 				    
                 self.visualisation.initializeVisualisation(self.graphNodes,self.graphLinks);
-				logMessage("froom", "tooo", "12345", "bzzz");
-                updateVisualisationWithClass(networkname_, 500);
+				//logMessage("froom", "tooo", "12345", "bzzz");
+                updateVisualisationWithClass(networkname_, 6000);
               },
               
               function(e){ console.log(e); }
@@ -153,6 +172,15 @@ function updateVisualisationWithClass(networkname_, delay){
                     })
                     .toArray();
                     
+                    console.log("newnodes " + newNodes);
+                    
+                    for (var i = 0; i < newNodes.length; i++) {
+						logMessage("Newnode: " + newNodes[i].id);
+					}
+					for (var i = 0; i < newLinks.length; i++) {
+						logMessage("Newlink: " + newLinks[i].source  + " => " + newLinks[i].target);
+					}
+                   
                     
 					self.visualisation.updateVisualisation(newNodes,newLinks,removeNodes,removeLinks,triggerMsgs);
 					setTimeout(function() {updateVisualisationWithClass(networkname_, delay)}, delay);
