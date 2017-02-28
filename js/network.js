@@ -1,15 +1,66 @@
 var BACKEND_URL='http://127.0.0.1:8888'; // our sim server
 var networkname = "meta"; // what to call the REST entry point
 var logdivid = "";
-	
-	
+
+var nodes = new Array(16);
+
+function init() {
+	for (var i = 0; i < 16; i++) {
+		nodes[i] = "";
+	}
+}
+
 function initializeServer(logdivid_){
 		if (logdivid_ != "") {
 			logdivid = logdivid_;
 		}
-		initializeVisualisationWithClass(networkname);
+		$.ajax({
+			type: "POST",
+			url: BACKEND_URL + "/",
+			data: JSON.stringify({Id: networkname}),
+			dataType: "json",
+			success: function() {
+				initializeVisualisationWithClass(networkname);
+			},
+		});
+			
+		
 
 };
+
+function initializeUpdater() {
+	
+	var item;
+	do {
+		item = midiNext();
+		if (item != undefined) {
+			var itemn = parseInt(item) - 1;
+			console.log("got midiitem " + item);
+			if (nodes[itemn] == "") {
+				$.ajax({
+					type: "POST",
+					url: BACKEND_URL + "/" + networkname +  "/node/",
+					dataType: "json",
+					success: function(e) {
+						nodes[itemn] = e.Id;
+					},
+				});
+			} else {
+				$.ajax({
+					type: "PUT",
+					crossDomain: true,
+					url: BACKEND_URL + "/" + networkname +  "/node/",
+					data: JSON.stringify({One: item}),
+					dataType: "json",
+					success: function(e) {
+						nodes[itemn] = e.Id;
+					},
+				});
+			}
+		}
+	} while (item != undefined);
+	setTimeout(initializeUpdater, 500);
+}
 
 function initializeVisualisationWithClass(networkname_){
 

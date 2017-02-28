@@ -21,13 +21,16 @@
         </div>
       </div>
     </div>
+    <script src="js/midi.js"></script>
     <script src="js/effects.js"></script>
     <script src="js/visuals.js"></script>
     <script src="js/network.js"></script>
     <script>
     $(document).ready(function() {
-			console.log("loaded");
+			init();
 			initializeServer("node-selected");	
+			initializePoller();
+			initializeUpdater();
 	});
     </script>
   </body>
